@@ -9,5 +9,6 @@ include(":PersistSettings")
 include(":FuckOffDiscord")
 include(":FullBio")
 include(":MarqueeEverywhere")
+include(":RoleContextMenu")
 
 rootProject.name = "HalalPlugins"
