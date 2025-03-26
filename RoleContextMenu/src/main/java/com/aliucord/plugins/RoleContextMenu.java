@@ -21,7 +21,7 @@ import androidx.core.content.ContextCompat;
 import com.aliucord.Constants;
 import com.aliucord.Logger;
 import com.aliucord.Utils;
-import com.aliucord.DimenUtils;
+// Removed import for DimenUtils as it does not exist in com.aliucord
 import com.aliucord.annotations.AliucordPlugin;
 import com.aliucord.entities.Plugin;
 import com.aliucord.patcher.*;
@@ -47,7 +47,7 @@ import java.util.*;
 @AliucordPlugin
 public class RoleContextMenu extends Plugin {
     private static FragmentManager cachedFragment = Utils.appActivity.getSupportFragmentManager();
-    private static final int p = DimenUtils.dpToPx(16);
+    private static final int p = Utils.dpToPx(16); // Changed to Utils.dpToPx
     public static class RoleBottomSheet extends BottomSheet {
         public void onViewCreated(View view, Bundle bundle) {
             super.onViewCreated(view, bundle);
@@ -63,11 +63,11 @@ public class RoleContextMenu extends Plugin {
             infoView.setPadding(0, 0, 0, p);
 
             SimpleDraweeView icon = new SimpleDraweeView(ctx);
-            icon.setLayoutParams(new LinearLayout.LayoutParams(DimenUtils.dpToPx(48), DimenUtils.dpToPx(48)));
+            icon.setLayoutParams(new LinearLayout.LayoutParams(Utils.dpToPx(48), Utils.dpToPx(48))); // Changed to Utils.dpToPx
             if(args.getBoolean("hasIcon", false)) {  
                 icon.setImageURI(String.format("https://cdn.discordapp.com/role-icons/%s/%s.png", args.getString("roleId", "0"), args.getString("icon", ""))); 
             } else {
-                icon.setImageResource(R.d.ic_role);
+                icon.setImageResource(R.drawable.ic_role); // Changed to R.drawable.ic_role
             }
             infoView.addView(icon);
 
@@ -127,7 +127,7 @@ public class RoleContextMenu extends Plugin {
     // Called when your plugin is started. This is the place to register command, add patches, etc
     public void start(Context context) throws NoSuchMethodException {
         
-        patcher.patch(RolesListView$updateView$$inlined$forEach$lambda$1.class.getDeclaredMethod("onClick", View.class), new PineInsteadFn(callFrame -> {
+        patcher.patch(RolesListView$updateView$$inlined$forEach$lambda$1.class.getDeclaredMethod("onClick", View.class), new Hook(callFrame -> { // Changed PineInsteadFn to Hook
             try {
                 GuildRole role = ((RolesListView$updateView$$inlined$forEach$lambda$1) callFrame.thisObject).$role;
                 RolesListView view = ((RolesListView$updateView$$inlined$forEach$lambda$1) callFrame.thisObject).this$0;
@@ -150,7 +150,7 @@ public class RoleContextMenu extends Plugin {
             return null;
         }));
 
-        patcher.patch(RoleMentionNode.class.getDeclaredMethod("render", SpannableStringBuilder.class, RoleMentionNode.RenderContext.class), new PineInsteadFn(callFrame -> {
+        patcher.patch(RoleMentionNode.class.getDeclaredMethod("render", SpannableStringBuilder.class, RoleMentionNode.RenderContext.class), new Hook(callFrame -> { // Changed PineInsteadFn to Hook
             RoleMentionNode _this = (RoleMentionNode) callFrame.thisObject;
             SpannableStringBuilder builder = (SpannableStringBuilder) callFrame.args[0];
             RoleMentionNode.RenderContext nodeRc = (RoleMentionNode.RenderContext) callFrame.args[1];
