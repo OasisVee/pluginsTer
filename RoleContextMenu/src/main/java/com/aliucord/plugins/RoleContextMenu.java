@@ -55,7 +55,7 @@ public class RoleContextMenu extends Plugin {
             Context ctx = view.getContext();
             var args = getArguments();
             var themedColor = ColorCompat.getThemedColor(ctx, R.b.colorInteractiveNormal);
-            boolean hasColor = args.getString("roleColor", "000000") != "default";
+            boolean hasColor = !args.getString("roleColor", "000000").equals("default");
 
             LinearLayout infoView = new LinearLayout(ctx);
             infoView.setOrientation(LinearLayout.HORIZONTAL);
@@ -64,7 +64,11 @@ public class RoleContextMenu extends Plugin {
 
             SimpleDraweeView icon = new SimpleDraweeView(ctx);
             icon.setLayoutParams(new LinearLayout.LayoutParams(DimenUtils.dpToPx(48), DimenUtils.dpToPx(48)));
-            if(args.getBoolean("hasIcon", false)) {  icon.setImageURI(String.format("https://cdn.discordapp.com/role-icons/%s/%s.png", args.getString("roleId", "0"), args.getString("icon", ""))); } else {  Drawable shield = ContextCompat.getDrawable(ctx, R.d.ic_shieldstar_24dp).mutate(); shield.setTint(hasColor ? Color.parseColor("#" + args.getString("roleColor", "000000")) : themedColor); icon.setImageDrawable(shield); }
+            if(args.getBoolean("hasIcon", false)) {  
+                icon.setImageURI(String.format("https://cdn.discordapp.com/role-icons/%s/%s.png", args.getString("roleId", "0"), args.getString("icon", ""))); 
+            } else {
+                icon.setImageResource(R.d.ic_role);
+            }
             infoView.addView(icon);
 
             LinearLayout details = new LinearLayout(ctx);
@@ -158,8 +162,28 @@ public class RoleContextMenu extends Plugin {
             GuildRole role = roles != null ? roles.get(Long.valueOf(_this.getRoleId())) : null;
             if (guildRole != null) {
                 builder.append(guildRole.g());
-                ClickableSpan cs = new ClickableSpan() { @Override public void onClick(View widget) { try { Bundle args = new Bundle(); args.putString("roleColor", role.b() != 0 ? String.format("%06x", role.b()) : "default"); args.putString("roleId", String.valueOf(role.getId())); args.putString("roleName", role.g()); args.putBoolean("isManaged", role.e()); args.putBoolean("isHoisted", role.c()); args.putBoolean("hasIcon", role.d() != null); if(role.d() != null) args.putString("icon", role.d()); var roleMenu = new RoleBottomSheet(); roleMenu.setArguments(args); roleMenu.show(cachedFragment, "Role Menu"); } catch(Throwable e) { log.error(e); } } @Override public void updateDrawState(TextPaint ds) { ds.setUnderlineText(false); }};
-                List<Object> listOf = Arrays.asList(cs, new StyleSpan(1), new ForegroundColorSpan(!RoleUtils.isDefaultColor(guildRole) ? ColorUtils.setAlphaComponent(guildRole.b(), 255) : ColorCompat.getThemedColor(nodeRc.getContext(), (int) R.b.theme_chat_mention_foreground)), new BackgroundColorSpan(!RoleUtils.isDefaultColor(guildRole) ? ColorUtils.setAlphaComponent(guildRole.b(), 25) : ColorCompat.getThemedColor(nodeRc.getContext(), (int) R.b.theme_chat_mention_background)));
+                ClickableSpan cs = new ClickableSpan() { 
+                    @Override 
+                    public void onClick(View widget) { 
+                        try { 
+                            Bundle args = new Bundle();
+                            args.putString("roleColor", role.b() != 0 ? String.format("%06x", role.b()) : "default");
+                            args.putString("roleId", String.valueOf(role.getId()));
+                            args.putString("roleName", role.g());
+                            args.putBoolean("isManaged", role.e());
+                            args.putBoolean("isHoisted", role.c());
+                            args.putBoolean("hasIcon", role.d() != null);
+                            if(role.d() != null) args.putString("icon", role.d());
+
+                            var roleMenu = new RoleBottomSheet();
+                            roleMenu.setArguments(args);
+                            roleMenu.show(cachedFragment, "Role Menu");
+                        } catch (Exception e) {
+                            log.error(e);
+                        }
+                    } 
+                };
+                List<Object> listOf = Arrays.asList(cs, new StyleSpan(1), new ForegroundColorSpan(!RoleUtils.isDefaultColor(guildRole) ? ColorUtils.setAlphaComponent(guildRole.b(), 255) : ColorCompat.getThemedColor(nodeRc.getContext(), R.b.colorInteractiveNormal)));
                 
                 for (Object obj : listOf) {
                     builder.setSpan(obj, length, builder.length(), 33);
